@@ -1,0 +1,628 @@
+---
+title: "Spotify Analysis"
+author: "Fawwaz Azrin"
+date: "2023-08-13"
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+editor_options:
+  markdown:
+    wrap: sentence
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r echo=FALSE, message=FALSE, results='hide'}
+library(jsonlite)
+library(tidyverse)
+library(dplyr)
+library(lubridate)
+# install.packages("DataExplorer")
+library(DataExplorer)
+library(ggplot2)
+library(stringr)
+library(factoextra)
+library(cluster)
+library(dplyr)
+library(psych)
+library(psychTools)
+library(readxl)
+library(ggpubr)
+library(fmsb)
+library(ggcorrplot)
+library(kableExtra)
+```
+
+### Data Cleaning
+
+I loaded the JSON files of the streaming history and append them to a master dataframe.
+I also read the csv file of the 1 Million song database.
+
+```{r}
+data1 <- fromJSON("StreamingHistory0.json", flatten = T)
+data2 <- fromJSON("StreamingHistory1.json", flatten = T)
+data3 <- fromJSON("StreamingHistory2.json", flatten = T)
+master.data <- rbind(data1,data2,data3)
+
+track.features.data <- read.csv("tracks_features.csv")
+```
+
+I introduced another column called `seconds` and obtain the values from `msPlayed`.
+This represents the number of seconds played of the track.
+
+```{r}
+master.data <- master.data %>%
+  mutate(seconds = msPlayed / 1000)
+```
+
+For easier analysis, we can convert the `endTime` and `release_date` to a `DateTime` format using POSIXct function.
+
+```{r results='hide'}
+# Convert character column to POSIXct datetime format
+master.data$endTime <- as.POSIXct(master.data$endTime, format = "%Y-%m-%d %H:%M")
+track.features.data$release_date <- as.POSIXct(track.features.data$release_date, format = "%Y-%m-%d")
+str(track.features.data)
+```
+
+Using regex to remove the square brakets and `'` symbol from the artist name in the 1 Million Song dataset.
+
+```{r}
+# Remove brackets and single quotes from the "Text" column
+track.features.data$artistName <- gsub("\\['|\\']", "", track.features.data$artists)
+```
+
+I want to view the month that I listened to Spotify the most by plotting a simple bar chart, ordered chronologically.
+The graph below shows that I listened to Spotify the most in June 2023 at `74.08` hours.
+
+```{r echo=FALSE, message=FALSE}
+x1 <- master.data %>%
+  group_by(month(endTime), year(endTime)) %>%
+  summarise(totalPlayed = sum(seconds)) %>%
+  rename(month = `month(endTime)`, year = `year(endTime)`) %>%
+  arrange(year)
+  
+# Combine month and year columns into a single column using lubridate
+x1$YearMonth <- paste(x1$year, x1$month, sep = "-")
+
+ggplot(x1, aes(reorder(YearMonth, -totalPlayed/3600), y = totalPlayed/3600)) + geom_bar(stat = 'identity', fill = "skyblue", alpha = 0.6) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x = "Year-Month", y = "Hours Played", title = "Month and Year and Total Hours Played") +
+  geom_text(aes(label = round(totalPlayed/3600, 2)), vjust = -0.5, size = 3) + 
+  theme(panel.grid = element_blank())
+ggsave("plot1.png")
+```
+
+I also want to look at the top 20 tracks that I listened to the most frequent within 2022-2023.
+Note that for the top 20 we can use the frequency instead of the total hours played to avoid bias with longer tracks.
+
+```{r echo=FALSE, message=FALSE}
+x2 <- master.data %>%
+  group_by(trackName, artistName) %>%
+  summarise(freq = n()) %>%
+  arrange(-freq) %>%
+  head(20)
+
+ggplot(x2, aes(x = reorder(trackName, -freq), y = freq)) + geom_bar(stat = 'identity', fill = "skyblue", alpha = 0.8) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x = "Track Name", y = "Frequency", title = "Most Frequent Tracks Listened from 2022 - 2023") +
+  geom_text(aes(label = freq), vjust = -0.5, size = 3) + 
+  ylim(0, 250) +
+  theme(panel.grid = element_blank()) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 25))
+ggsave("plot2.png")
+```
+
+```{r}
+x22 <- master.data %>%
+  group_by(hour(endTime)) %>%
+  summarise(totalPlayed = sum(seconds)/3600) %>%
+  mutate(hour = `hour(endTime)`) %>%
+  mutate(hour = paste0(formatC(0:23, width = 2, flag = "0"), ":00")
+)
+
+ggplot(x22, aes(x = hour, y = totalPlayed)) + geom_bar(stat = 'identity', alpha = 0.6, fill = 'skyblue') + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x = "Hour", y = "Hours Played", title = "Total Hours Played By Hourly") +
+  geom_text(aes(label = round(totalPlayed, 2)), vjust = -0.5, size = 2) + 
+  theme(panel.grid = element_blank())
+```
+
+Due to the difficulties in obtaining the relevant information from the Spotify API calls, we will use an existing dataset obtained from Kaggle to extract those information.
+The attributes include:
+
+-   danceability
+
+-   energy
+
+-   key
+
+-   loudness
+
+-   mode
+
+-   speechiness
+
+-   acousticness
+
+-   instrumentalness
+
+-   liveness
+
+-   valence
+
+-   tempo
+
+We will then join these attributes to the song list extracted from the streaming history data and remove any rows that do not have the attributes.
+This approach will make the clustering easier and less power intensive as we have less amount of data to analyse.
+However, the data limitation can limit the accuracies and may not provide the best insights on my listening pattern.
+
+After removing the NAs, we will have 871 rows of data.
+
+```{r message=FALSE, warning=FALSE}
+x22 <- master.data %>%
+  group_by(trackName, artistName) %>%
+  summarise(freq = n()) %>%
+  arrange(-freq)
+
+chosen <- c("danceability", "energy", "key", "loudness", "mode", "speechiness", "acousticness", "instrumentalness", "liveness", "valence", "tempo")
+
+merged_df <- left_join(x22, track.features.data, by = c("trackName" = "name", "artistName"))
+merged_df <- merged_df %>%
+  select(trackName, artistName, freq, chosen)
+
+# remove duplicates
+df <- distinct(merged_df)
+
+unique_df <- df %>%
+  distinct(trackName, artistName, .keep_all = TRUE)
+
+# remove NAs
+df_no_na <- na.omit(unique_df)
+kable(head(df_no_na, 5)) %>%
+  kable_styling(latex_options = "striped")
+```
+
+And I will also change the `key` column to factor
+
+```{r}
+df_no_na$key <- as.factor(df_no_na$key)
+```
+
+## Data Exploratory
+
+### Glossary
+
+-   **Acousticness**: Numerical, Confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.
+-   **Danceability**: Numerical, danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable.
+-   **Energy**: Numerical, Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy. -
+-   **Instrumentalness**: Numerical, predicts whether a track contains no vocals. "Ooh" and "aah" sounds are treated as instrumental in this context. Rap or spoken word tracks are clearly "vocal". The closer the instrumentalness value is to 1.0, the greater likelihood the track contains no vocal content. Values above 0.5 are intended to represent instrumental tracks, but confidence is higher as the value approaches 1.0.
+-   **Key**: Numerical, the estimated overall key of the track. Integers map to pitches using standard Pitch Class notation . E.g. 0 = C, 1 = C#/Db, 2 = D, and so on. If no key was detected, the value is -1.
+-   **Liveness**: Numerical, detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. A value above 0.8 provides strong likelihood that the track is live.
+-   **Loudness**: Numerical, Overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typical range between -60 and 0 db. Mode: Numerical, mode indicates the modality (major or minor) of a track, the type of scale from which its melodic content is derived. Major is represented by 1 and minor is 0.
+-   **Popularity**: Numerical, the popularity of a track is a value between 0 and 100, with 100 being the most popular. The popularity is calculated by algorithm and is based, in the most part, on the total number of plays the track has had and how recent those plays are.
+-   **Release_date**: Date the song was released
+-   **Speechiness**: Numerical, speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks.
+-   **Tempo**: Numerical, Overall estimated tempo of a track in beats per minute (BPM). In musical terminology, tempo is the speed or pace of a given piece and derives directly from the average beat duration.
+-   **Valence**: Numerical, Measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry). Year: Year the song was released
+-   **Mode**: Numerical, mode indicates the modality (major or minor) of a track, the type of scale from which its melodic content is derived. Major is represented by 1 and minor is 0.
+
+### Correlation between variables
+
+We can identify the correlation between the variables using the correlation matrix and visualize it with a Heatmap.
+We can observe that:
+
+-   `acousticness` has a negative relationship with `energy`
+
+-   `acousticness` has a negative relationship with `loudness`
+
+-   `danceability` has a positive relationship with `valence`
+
+-   `loudness` has a strong positive relationship with `energy`
+
+```{r echo=FALSE}
+# Calculate the correlation matrix
+x3 <- df_no_na %>%
+  subset(select = c(-trackName, -artistName))
+
+cor_matrix <- cor(subset(x3, select = -key))
+
+# Create a heatmap of the correlation matrix
+ggcorrplot(cor_matrix)
+```
+
+```{r echo=FALSE}
+# acousticness and energy
+ggplot(x3, aes(energy, acousticness, color = loudness)) + geom_point(stat = 'identity') + theme_minimal() + labs(title = "Scatter Plot of Energy with Acousticness and Loudness")
+```
+
+### Distribution
+
+We are also interested in the music attribute distributions of my listening habit.
+First, we will use a `facet_grid` to plot multiple density charts of the attributes that have the range from `0.0` to `1.0`.
+From the charts below, I can find that:
+
+-   I generally prefer to listen to sad and moody songs - higher distribution of low valence compared to high valence.
+
+-   I generally listen to energetic songs.
+
+-   I don't really listen to live music that much.
+
+-   I don't really listen to acoustic songs that much.
+
+-   Most of the songs that I listen to have vocals.
+
+```{r echo=FALSE}
+# get top 300
+x4 <- x3 %>% 
+  head(300) %>%
+  select(-tempo, -loudness, -key, -speechiness, -mode) %>%
+  pivot_longer(cols = -freq,
+    names_to = "Variable",
+               values_to = "Value") %>%
+  select(-freq)
+  
+ggplot(x4, aes(x = Value)) +
+  geom_density(fill = "lightblue", alpha = 0.6) +
+  facet_grid(Variable ~ ., scales = "free") +
+  labs(x = "Value", y = "Density") +
+  theme_minimal() + 
+  theme(strip.placement = "top")
+```
+
+Other observations include:
+
+-   generally low on `speechiness` - I don't really listen to podcast.
+
+-   I prefer faster songs with higher tempo.
+
+-   Key `1` is the mode of the `key` distribution
+
+```{r echo=FALSE}
+x4_ <- x3 %>%
+  head(300)
+ggplot(x4_, aes(x = speechiness)) + geom_density(fill = 'lightblue', alpha = 0.6) +
+  theme_minimal()
+
+ggplot(x4_, aes(x = tempo)) + geom_density(fill = 'lightblue', alpha = 0.6) +
+  theme_minimal()
+
+ggplot(x4_, aes(x = mode)) + geom_density(fill = 'lightblue', alpha = 0.6) +
+  theme_minimal()
+
+x4_ %>%
+  group_by(key) %>%
+  summarise(f = n()) %>%
+  ggplot(aes(x = key, y = f)) + geom_bar(stat='identity', fill = 'skyblue', alpha = 0.6) +
+  theme_minimal() + 
+  labs(x = "Key", y = "Frequency", title = "Key Frequency") + 
+  theme(panel.grid = element_blank())
+```
+
+### Unsupervised Learning - Clustering
+
+Since I do not have the `genre` tags from my streaming history dataset, I will manually label the genres by conducting clustering analysis based on the attributes.
+Since `key` is categorical, we will remove that to perform the clustering.
+
+```{r echo=FALSE, results='hide'}
+x3 <- x3 %>%
+  select(-key)
+Maha <- mahalanobis(x3, colMeans(x3), cov(x3))
+MahaPvalue <-pchisq(Maha, df=10, lower.tail = FALSE)
+print(sum(MahaPvalue<0.01))
+```
+
+```{r echo=FALSE}
+x5 <- cbind(x3, Maha, MahaPvalue)
+```
+
+```{r echo=FALSE}
+# view correlation
+x3_ <- x3 %>%
+  select(-freq, -mode)
+corr_mat <- cor(x3_)
+lowerCor(x3_)
+```
+
+I will use the `scale()` function to normalize the values.
+
+```{r}
+# normalize data
+x6 <- scale(x3_)
+kable(headTail(x6)) %>%
+  kable_styling(latex_options = "striped")
+```
+
+```{r echo=FALSE, eval=FALSE}
+# I will find the agglomerative values of each linkage methods and choose the linkage with the highest value. Please refer to the information regarding linkage methods here (link). This will be used for the hierarchical clustering.
+m <- c( "average", "single", "complete", "ward")
+names(m) <- c( "average", "single", "complete", "ward")
+```
+
+```{r echo=FALSE, eval=FALSE}
+ac <- function(x) {
+  agnes(x6, method = x)$ac
+}
+```
+
+```{r echo=FALSE, eval=FALSE}
+# Calculate agglomerative coefficient
+# Ward outputs the highest agglomerative coefficient. Hence, I will use the Ward's method for my hierarchical clustering.
+sapply(m, ac)
+```
+
+Next, I will run the Gap Statistic to determine the most optimal number of clusters to be used for the dataset.
+The Gap Statistic finds that the k value consistently increases as the number of clusters increases until when `k = 9`.
+**We will use 9 as the number of clusters** as it gives the highest value of `k`.
+
+```{r echo=FALSE}
+gap_stat <- clusGap(x6, FUN = hcut, nstart = 25, K.max = 10, B = 50)
+fviz_gap_stat(gap_stat)
+```
+
+```{r eval=FALSE, echo=FALSE}
+distance_mat <- dist(x6, method = 'euclidean')
+
+set.seed(240)  # Setting seed
+Hierar_cl <- hclust(distance_mat, method = "ward")
+Hierar_cl
+```
+
+```{r eval=FALSE, echo=FALSE}
+# Dendogram of the hierarchical clustering.
+plot(Hierar_cl)
+```
+
+```{r eval=FALSE, echo=FALSE}
+# Cutting the clusters
+fit <- cutree(Hierar_cl, k = 6)
+fit
+```
+
+```{r eval=FALSE, echo=FALSE}
+table(fit)
+```
+
+```{r eval=FALSE, echo=FALSE}
+x7 <- df_no_na %>%
+  cbind(cluster = fit)
+
+final_data <- cbind(x6, cluster = fit)
+```
+
+```{r eval=FALSE, echo=FALSE}
+head(final_data)
+```
+
+```{r eval=FALSE, echo=FALSE}
+# Find mean values for each cluster
+hcentres<-aggregate(x=final_data, by=list(cluster=fit), FUN="mean")
+print(hcentres)
+```
+
+#### K-Means
+
+I will use K-Means algorithm to perform the clustering, having defined the cluster `k = 9`
+
+```{r results='hide'}
+set.seed(55)
+k_cl <- kmeans(x6,9,nstart=25)
+k_cl 
+```
+
+Mapping of clusters on a 2-Dimensional graph.
+
+```{r echo=FALSE}
+fviz_cluster(k_cl, data = x6,
+             palette = c("#FF5733", "#33FF57", "#5733FF", "#FFC733", "#33FFDD", "#DD33FF", "#FF5733", "#A733FF", "#33FF99"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             ggtheme = theme_bw()
+             )
+```
+
+Let's look at the number of tracks belonging to each cluster.
+
+```{r echo=FALSE}
+kable(table(k_cl$cluster)) %>%
+  kable_styling("striped")
+```
+
+To understand each of the cluster better, I want to check what songs belong to which cluster.
+I will append the song information with the clustering result from the K-Means, together with the listening frequency for all of the songs.
+
+```{r echo=FALSE}
+x8 <- df_no_na %>%
+  cbind(cluster = k_cl$cluster)
+
+# only extract trackName, artistName and cluster
+x9 <- x8 %>%
+  select(trackName, artistName, cluster, freq) %>%
+  arrange(cluster)
+
+kable(headTail(x9)) %>%
+  kable_styling("striped")
+```
+
+Let's look at the cluster centers for each of the song attribute.
+
+```{r echo=FALSE}
+kmeans_centres <- as.data.frame(k_cl$centers)
+kmeans_centres <- kmeans_centres %>%
+  mutate(cluster = row_number()) %>%
+  relocate(cluster)
+kable(kmeans_centres) %>%
+  kable_styling("striped")
+```
+
+Next, we can visualize them with a dodged bar plot.
+Immediately we can summarize the characteristics of each cluster.
+
+-   Cluster 1: sad and moody, ambient and atmospheric, lack of vocals.
+    **Ambient/Instrumental Soundscapes**
+
+-   Cluster 2: very somber songs, with slow beats.
+    perfect to chill with.
+    **Atmospheric Downtempo**
+
+-   Cluster 3: energetic and loud but not really for dancing.
+    **High-Energy Rock/Alternative**
+
+-   Cluster 4: slow songs and probably emotional songs.
+    **Acoustic Ballads**
+
+-   Cluster 5: rap or fast vocals.
+    **Fast-Paced Rap/Energetic**
+
+-   Cluster 6: very high energy and loud songs, with positive valence - good for exercise/active listening.
+    **High-Energy Electronic/Dance**
+
+-   Cluster 7: high `acousticness` and `instrumentalness`, slow and sad mood, a lot of piano/guitar, calm.
+    **Solo Piano/Instrumental**
+
+-   Cluster 8: very danceable and positive, summer songs.
+    **Dance-Pop/Upbeat**
+
+-   Cluster 9: live/orchestra in the recordings.
+    **Live Concert Recordings**
+
+```{r}
+x10 <- kmeans_centres %>%
+  pivot_longer(cols = -cluster,
+               names_to = "Variable",
+               values_to = "Value")
+
+x10$cluster <- as.factor(x10$cluster)
+
+ggplot(x10, aes(x = Variable, y = Value, fill = cluster)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Variable", y = "Value", fill = "Cluster") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+#### Use Polar Plot
+
+```{r echo=FALSE}
+create_beautiful_radarchart <- function(cx, color = "#00AFBB", 
+                                        vlabels = colnames(data), vlcex = 0.7,
+                                        caxislabels = NULL, title = NULL,...){
+  radarchart(
+    cx, axistype = 1,
+    # Customize the polygon
+    pcol = color, pfcol = scales::alpha(color, 0.5), plwd = 2, plty = 1,
+    # Customize the grid
+    cglcol = "grey", cglty = 1, cglwd = 0.8,
+    # Customize the axis
+    axislabcol = "grey", 
+    # Variable labels
+    vlcex = vlcex, vlabels = vlabels,
+    caxislabels = caxislabels, title = title, ...
+  )
+}
+```
+
+```{r echo=FALSE}
+# Define the variable ranges: maximum and minimum
+max_min <- data.frame(
+  danceability = c(2.5, -2.5), energy = c(2.5, -2.5),
+  loudness = c(2.5, -2.5), speechiness = c(2.5, -2.5),
+  instrumentalness = c(2.5, -2.5), acousticness = c(2.5, -2.5), liveness = c(2.5, -2.5), valence = c(2.5, -2.5), tempo = c(2.5,-2.5)
+)
+rownames(max_min) <- c("Max", "Min")
+
+# Bind the variable ranges to the data
+x11 <- rbind(max_min, kmeans_centres[,c(-1)])
+```
+
+```{r echo=FALSE}
+# Define colors and titles
+colors <- c("#FF5733", "#33FF57", "#5733FF", "#FFC733", "#33FFDD", "#DD33FF", "#FF5733", "#A733FF", "#33FF99")
+titles <- c("Cluster 1", "Cluster 2", "Cluster 3", "Cluster 4", "Cluster 5", "Cluster 6", "Cluster 7", "Cluster 8", "Cluster 9")
+
+# Reduce plot margin using par()
+# Split the screen in 3 parts
+op <- par(mar = c(1, 1, 1, 1))
+par(mfrow = c(1,3))
+
+for(i in 1:9){
+  create_beautiful_radarchart(
+    cx = x11[c(1, 2, i + 2), ], caxislabels = c(-2.5, -1.5, 0, 1.5, 2.5),
+    color = colors[i], title = titles[i]
+    )
+}
+```
+
+We can contextualize the description of the clusters further by highlighting the tracks.
+I have only highlighted the top 20 most listened songs for each cluster for my personal relevance.
+However, a better approach would be to obtain the top 20 elements closest to the **K-means cluster centers** to describe the clusters.
+
+```{r echo=FALSE}
+# rename cluster
+x9 <- x9 %>%
+  mutate(cluster = recode_factor(cluster, "1" = "ambient", "2" = "atmospheric-downtempo", "3" = "alt-rock", "4" = "ballads", "5" = "rap", "6" = "dance-pop", "7" = "acoustic", "8" = "upbeat", "9" = "live"))
+
+x90 <- x9 %>%
+  group_by(cluster) %>%
+  top_n(n = 20, wt = trackName) %>%
+  arrange(cluster, -freq)
+
+x90 <- x90 %>%
+  select(-freq) %>%
+  unite(trackArtist, trackName, artistName, sep = " - ")
+
+x90 <- x90 %>%
+  group_by(cluster) %>%
+  mutate(id = 1:20)
+
+x90 <- x90 %>%
+  pivot_wider(names_from = cluster, values_from = trackArtist)
+
+kable(x90) %>%
+  kable_styling(latex_options = "striped")
+```
+
+Get the frequency and seconds played of each cluster to understand listening habits
+
+```{r message=FALSE}
+x9
+x12 <- left_join(master.data, x9, by = c("trackName", "artistName"))
+x12 <- na.omit(x12)
+
+x13 <- x12 %>%
+  group_by(cluster) %>%
+  summarise(totalPlayed = sum(seconds), freq = n()) %>%
+  mutate(cluster = as.factor(cluster))
+
+ggplot(x13, aes(x = reorder(cluster, -totalPlayed), y = totalPlayed/3600)) + geom_bar(stat = 'identity', fill = 'skyblue') + theme_minimal() + labs(x = "Cluster", y = "Total Hours Played") + geom_text(aes(label = round(totalPlayed/3600, 0)), vjust = -0.5, size = 3) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggplot(x13, aes(x = reorder(cluster, -freq), y = freq)) + geom_bar(stat = 'identity', fill = '#FFC733') + theme_minimal() + labs(x = "Cluster", y = "Frequency") + geom_text(aes(label = round(freq, 0)), vjust = -0.5, size = 3) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+Get frequency by month
+
+```{r message=FALSE, echo=FALSE}
+ordinal_levels <- c("8-2022", "9-2022", "10-2022", "11-2022", "12-2022", "1-2023", "2-2023", "3-2023", "4-2023", "5-2023", "6-2023", "7-2023", "8-2023")
+
+x14 <- x12 %>%
+  group_by(month(endTime), year(endTime)) %>%
+  unite(monthYear, `month(endTime)`, `year(endTime)`, sep = "-") %>%
+  group_by(monthYear, cluster) %>%
+  summarise(freq = n(), totalPlayed = sum(seconds)/3600) %>%
+  mutate(cluster = as.factor(cluster), monthYear = factor(monthYear, ordered = TRUE, levels = ordinal_levels))
+
+ggplot(x14, aes(fill=cluster, y=freq, x=monthYear)) + 
+    geom_bar(position="fill", stat="identity") +   theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggplot(x14, aes(fill=cluster, y=totalPlayed, x=monthYear)) + 
+    geom_bar(position="fill", stat="identity") +   theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(y = "Total Hours Played by %", x = "Month-Year", title = "How my Listening Pattern Evolved over Time")
+```

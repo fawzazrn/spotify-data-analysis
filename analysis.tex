@@ -1,0 +1,806 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Spotify Analysis},
+  pdfauthor={Fawwaz Azrin},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Spotify Analysis}
+\author{Fawwaz Azrin}
+\date{2023-08-13}
+
+\begin{document}
+\maketitle
+
+\hypertarget{r-markdown}{%
+\subsection{R Markdown}\label{r-markdown}}
+
+\hypertarget{data-cleaning}{%
+\subsubsection{Data Cleaning}\label{data-cleaning}}
+
+I loaded the JSON files of the streaming history and append them to a
+master dataframe. I also read the csv file of the 1 Million song
+database.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data1 }\OtherTok{\textless{}{-}} \FunctionTok{fromJSON}\NormalTok{(}\StringTok{"StreamingHistory0.json"}\NormalTok{, }\AttributeTok{flatten =}\NormalTok{ T)}
+\NormalTok{data2 }\OtherTok{\textless{}{-}} \FunctionTok{fromJSON}\NormalTok{(}\StringTok{"StreamingHistory1.json"}\NormalTok{, }\AttributeTok{flatten =}\NormalTok{ T)}
+\NormalTok{data3 }\OtherTok{\textless{}{-}} \FunctionTok{fromJSON}\NormalTok{(}\StringTok{"StreamingHistory2.json"}\NormalTok{, }\AttributeTok{flatten =}\NormalTok{ T)}
+\NormalTok{master.data }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(data1,data2,data3)}
+
+\NormalTok{track.features.data }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"tracks\_features.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+I introduced another column called \texttt{seconds} and obtain the
+values from \texttt{msPlayed}. This represents the number of seconds
+played of the track.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{master.data }\OtherTok{\textless{}{-}}\NormalTok{ master.data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{seconds =}\NormalTok{ msPlayed }\SpecialCharTok{/} \DecValTok{1000}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+For easier analysis, we can convert the \texttt{endTime} and
+\texttt{release\_date} to a \texttt{DateTime} format using POSIXct
+function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Convert character column to POSIXct datetime format}
+\NormalTok{master.data}\SpecialCharTok{$}\NormalTok{endTime }\OtherTok{\textless{}{-}} \FunctionTok{as.POSIXct}\NormalTok{(master.data}\SpecialCharTok{$}\NormalTok{endTime, }\AttributeTok{format =} \StringTok{"\%Y{-}\%m{-}\%d \%H:\%M"}\NormalTok{)}
+\NormalTok{track.features.data}\SpecialCharTok{$}\NormalTok{release\_date }\OtherTok{\textless{}{-}} \FunctionTok{as.POSIXct}\NormalTok{(track.features.data}\SpecialCharTok{$}\NormalTok{release\_date, }\AttributeTok{format =} \StringTok{"\%Y{-}\%m{-}\%d"}\NormalTok{)}
+\FunctionTok{str}\NormalTok{(track.features.data)}
+\end{Highlighting}
+\end{Shaded}
+
+Using regex to remove the square brakets and \texttt{\textquotesingle{}}
+symbol from the artist name in the 1 Million Song dataset.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Remove brackets and single quotes from the "Text" column}
+\NormalTok{track.features.data}\SpecialCharTok{$}\NormalTok{artistName }\OtherTok{\textless{}{-}} \FunctionTok{gsub}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{[\textquotesingle{}|}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{\textquotesingle{}]"}\NormalTok{, }\StringTok{""}\NormalTok{, track.features.data}\SpecialCharTok{$}\NormalTok{artists)}
+\end{Highlighting}
+\end{Shaded}
+
+I want to view the month that I listened to Spotify the most by plotting
+a simple bar chart, ordered chronologically. The graph below shows that
+I listened to Spotify the most in June 2023 at \texttt{74.08} hours.
+
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+I also want to look at the top 20 tracks that I listened to the most
+frequent within 2022-2023. Note that for the top 20 we can use the
+frequency instead of the total hours played to avoid bias with longer
+tracks.
+
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{x22 }\OtherTok{\textless{}{-}}\NormalTok{ master.data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(}\FunctionTok{hour}\NormalTok{(endTime)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{totalPlayed =} \FunctionTok{sum}\NormalTok{(seconds)}\SpecialCharTok{/}\DecValTok{3600}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{hour =} \StringTok{\textasciigrave{}}\AttributeTok{hour(endTime)}\StringTok{\textasciigrave{}}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{hour =} \FunctionTok{paste0}\NormalTok{(}\FunctionTok{formatC}\NormalTok{(}\DecValTok{0}\SpecialCharTok{:}\DecValTok{23}\NormalTok{, }\AttributeTok{width =} \DecValTok{2}\NormalTok{, }\AttributeTok{flag =} \StringTok{"0"}\NormalTok{), }\StringTok{":00"}\NormalTok{)}
+\NormalTok{)}
+
+\FunctionTok{ggplot}\NormalTok{(x22, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ hour, }\AttributeTok{y =}\NormalTok{ totalPlayed)) }\SpecialCharTok{+} \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{\textquotesingle{}identity\textquotesingle{}}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.6}\NormalTok{, }\AttributeTok{fill =} \StringTok{\textquotesingle{}skyblue\textquotesingle{}}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{90}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Hour"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Hours Played"}\NormalTok{, }\AttributeTok{title =} \StringTok{"Total Hours Played By Hourly"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_text}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{label =} \FunctionTok{round}\NormalTok{(totalPlayed, }\DecValTok{2}\NormalTok{)), }\AttributeTok{vjust =} \SpecialCharTok{{-}}\FloatTok{0.5}\NormalTok{, }\AttributeTok{size =} \DecValTok{2}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{panel.grid =} \FunctionTok{element\_blank}\NormalTok{())}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-8-1.pdf}
+
+Due to the difficulties in obtaining the relevant information from the
+Spotify API calls, we will use an existing dataset obtained from Kaggle
+to extract those information. The attributes include:
+
+\begin{itemize}
+\item
+  danceability
+\item
+  energy
+\item
+  key
+\item
+  loudness
+\item
+  mode
+\item
+  speechiness
+\item
+  acousticness
+\item
+  instrumentalness
+\item
+  liveness
+\item
+  valence
+\item
+  tempo
+\end{itemize}
+
+We will then join these attributes to the song list extracted from the
+streaming history data and remove any rows that do not have the
+attributes. This approach will make the clustering easier and less power
+intensive as we have less amount of data to analyse. However, the data
+limitation can limit the accuracies and may not provide the best
+insights on my listening pattern.
+
+After removing the NAs, we will have 871 rows of data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{x22 }\OtherTok{\textless{}{-}}\NormalTok{ master.data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(trackName, artistName) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{freq =} \FunctionTok{n}\NormalTok{()) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{arrange}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{freq)}
+
+\NormalTok{chosen }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"danceability"}\NormalTok{, }\StringTok{"energy"}\NormalTok{, }\StringTok{"key"}\NormalTok{, }\StringTok{"loudness"}\NormalTok{, }\StringTok{"mode"}\NormalTok{, }\StringTok{"speechiness"}\NormalTok{, }\StringTok{"acousticness"}\NormalTok{, }\StringTok{"instrumentalness"}\NormalTok{, }\StringTok{"liveness"}\NormalTok{, }\StringTok{"valence"}\NormalTok{, }\StringTok{"tempo"}\NormalTok{)}
+
+\NormalTok{merged\_df }\OtherTok{\textless{}{-}} \FunctionTok{left\_join}\NormalTok{(x22, track.features.data, }\AttributeTok{by =} \FunctionTok{c}\NormalTok{(}\StringTok{"trackName"} \OtherTok{=} \StringTok{"name"}\NormalTok{, }\StringTok{"artistName"}\NormalTok{))}
+\NormalTok{merged\_df }\OtherTok{\textless{}{-}}\NormalTok{ merged\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(trackName, artistName, freq, chosen)}
+
+\CommentTok{\# remove duplicates}
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{distinct}\NormalTok{(merged\_df)}
+
+\NormalTok{unique\_df }\OtherTok{\textless{}{-}}\NormalTok{ df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{distinct}\NormalTok{(trackName, artistName, }\AttributeTok{.keep\_all =} \ConstantTok{TRUE}\NormalTok{)}
+
+\CommentTok{\# remove NAs}
+\NormalTok{df\_no\_na }\OtherTok{\textless{}{-}} \FunctionTok{na.omit}\NormalTok{(unique\_df)}
+\FunctionTok{kable}\NormalTok{(}\FunctionTok{head}\NormalTok{(df\_no\_na, }\DecValTok{5}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{latex\_options =} \StringTok{"striped"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}
+\centering
+\begin{tabular}{l|l|r|r|r|r|r|r|r|r|r|r|r|r}
+\hline
+trackName & artistName & freq & danceability & energy & key & loudness & mode & speechiness & acousticness & instrumentalness & liveness & valence & tempo\\
+\hline
+\cellcolor{gray!6}{Andromeda} & \cellcolor{gray!6}{Weyes Blood} & \cellcolor{gray!6}{144} & \cellcolor{gray!6}{0.467} & \cellcolor{gray!6}{0.461} & \cellcolor{gray!6}{1} & \cellcolor{gray!6}{-7.940} & \cellcolor{gray!6}{0} & \cellcolor{gray!6}{0.0274} & \cellcolor{gray!6}{0.368000} & \cellcolor{gray!6}{1.15e-03} & \cellcolor{gray!6}{0.358} & \cellcolor{gray!6}{0.188} & \cellcolor{gray!6}{131.325}\\
+\hline
+I Won't See You Tonight Part 1 & Avenged Sevenfold & 100 & 0.400 & 0.719 & 7 & -5.109 & 0 & 0.0492 & 0.000451 & 5.81e-03 & 0.218 & 0.101 & 129.505\\
+\hline
+\cellcolor{gray!6}{Under The Influence} & \cellcolor{gray!6}{Chris Brown} & \cellcolor{gray!6}{89} & \cellcolor{gray!6}{0.733} & \cellcolor{gray!6}{0.690} & \cellcolor{gray!6}{9} & \cellcolor{gray!6}{-5.529} & \cellcolor{gray!6}{0} & \cellcolor{gray!6}{0.0427} & \cellcolor{gray!6}{0.063500} & \cellcolor{gray!6}{1.20e-06} & \cellcolor{gray!6}{0.105} & \cellcolor{gray!6}{0.310} & \cellcolor{gray!6}{116.992}\\
+\hline
+Lonely Day & System Of A Down & 84 & 0.470 & 0.796 & 8 & -3.277 & 0 & 0.0336 & 0.362000 & 1.10e-06 & 0.133 & 0.215 & 113.108\\
+\hline
+\cellcolor{gray!6}{Chop Suey!} & \cellcolor{gray!6}{System Of A Down} & \cellcolor{gray!6}{76} & \cellcolor{gray!6}{0.419} & \cellcolor{gray!6}{0.934} & \cellcolor{gray!6}{7} & \cellcolor{gray!6}{-3.908} & \cellcolor{gray!6}{0} & \cellcolor{gray!6}{0.1200} & \cellcolor{gray!6}{0.000278} & \cellcolor{gray!6}{1.50e-03} & \cellcolor{gray!6}{0.132} & \cellcolor{gray!6}{0.286} & \cellcolor{gray!6}{127.288}\\
+\hline
+\end{tabular}
+\end{table}
+
+And I will also change the \texttt{key} column to factor
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_no\_na}\SpecialCharTok{$}\NormalTok{key }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(df\_no\_na}\SpecialCharTok{$}\NormalTok{key)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{data-exploratory}{%
+\subsection{Data Exploratory}\label{data-exploratory}}
+
+\hypertarget{glossary}{%
+\subsubsection{Glossary}\label{glossary}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Acousticness}: Numerical, Confidence measure from 0.0 to 1.0
+  of whether the track is acoustic. 1.0 represents high confidence the
+  track is acoustic.
+\item
+  \textbf{Danceability}: Numerical, danceability describes how suitable
+  a track is for dancing based on a combination of musical elements
+  including tempo, rhythm stability, beat strength, and overall
+  regularity. A value of 0.0 is least danceable and 1.0 is most
+  danceable.
+\item
+  \textbf{Energy}: Numerical, Energy is a measure from 0.0 to 1.0 and
+  represents a perceptual measure of intensity and activity. Typically,
+  energetic tracks feel fast, loud, and noisy. For example, death metal
+  has high energy, while a Bach prelude scores low on the scale.
+  Perceptual features contributing to this attribute include dynamic
+  range, perceived loudness, timbre, onset rate, and general entropy. -
+\item
+  \textbf{Instrumentalness}: Numerical, predicts whether a track
+  contains no vocals. ``Ooh'' and ``aah'' sounds are treated as
+  instrumental in this context. Rap or spoken word tracks are clearly
+  ``vocal''. The closer the instrumentalness value is to 1.0, the
+  greater likelihood the track contains no vocal content. Values above
+  0.5 are intended to represent instrumental tracks, but confidence is
+  higher as the value approaches 1.0.
+\item
+  \textbf{Key}: Numerical, the estimated overall key of the track.
+  Integers map to pitches using standard Pitch Class notation . E.g. 0 =
+  C, 1 = C\#/Db, 2 = D, and so on. If no key was detected, the value is
+  -1.
+\item
+  \textbf{Liveness}: Numerical, detects the presence of an audience in
+  the recording. Higher liveness values represent an increased
+  probability that the track was performed live. A value above 0.8
+  provides strong likelihood that the track is live.
+\item
+  \textbf{Loudness}: Numerical, Overall loudness of a track in decibels
+  (dB). Loudness values are averaged across the entire track and are
+  useful for comparing relative loudness of tracks. Loudness is the
+  quality of a sound that is the primary psychological correlate of
+  physical strength (amplitude). Values typical range between -60 and 0
+  db. Mode: Numerical, mode indicates the modality (major or minor) of a
+  track, the type of scale from which its melodic content is derived.
+  Major is represented by 1 and minor is 0.
+\item
+  \textbf{Popularity}: Numerical, the popularity of a track is a value
+  between 0 and 100, with 100 being the most popular. The popularity is
+  calculated by algorithm and is based, in the most part, on the total
+  number of plays the track has had and how recent those plays are.
+\item
+  \textbf{Release\_date}: Date the song was released
+\item
+  \textbf{Speechiness}: Numerical, speechiness detects the presence of
+  spoken words in a track. The more exclusively speech-like the
+  recording (e.g.~talk show, audio book, poetry), the closer to 1.0 the
+  attribute value. Values above 0.66 describe tracks that are probably
+  made entirely of spoken words. Values between 0.33 and 0.66 describe
+  tracks that may contain both music and speech, either in sections or
+  layered, including such cases as rap music. Values below 0.33 most
+  likely represent music and other non-speech-like tracks.
+\item
+  \textbf{Tempo}: Numerical, Overall estimated tempo of a track in beats
+  per minute (BPM). In musical terminology, tempo is the speed or pace
+  of a given piece and derives directly from the average beat duration.
+\item
+  \textbf{Valence}: Numerical, Measure from 0.0 to 1.0 describing the
+  musical positiveness conveyed by a track. Tracks with high valence
+  sound more positive (e.g.~happy, cheerful, euphoric), while tracks
+  with low valence sound more negative (e.g.~sad, depressed, angry).
+  Year: Year the song was released
+\item
+  \textbf{Mode}: Numerical, mode indicates the modality (major or minor)
+  of a track, the type of scale from which its melodic content is
+  derived. Major is represented by 1 and minor is 0.
+\end{itemize}
+
+\hypertarget{correlation-between-variables}{%
+\subsubsection{Correlation between
+variables}\label{correlation-between-variables}}
+
+We can identify the correlation between the variables using the
+correlation matrix and visualize it with a Heatmap. We can observe that:
+
+\begin{itemize}
+\item
+  \texttt{acousticness} has a negative relationship with \texttt{energy}
+\item
+  \texttt{acousticness} has a negative relationship with
+  \texttt{loudness}
+\item
+  \texttt{danceability} has a positive relationship with
+  \texttt{valence}
+\item
+  \texttt{loudness} has a strong positive relationship with
+  \texttt{energy}
+\end{itemize}
+
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-11-1.pdf}
+
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-12-1.pdf}
+
+\hypertarget{distribution}{%
+\subsubsection{Distribution}\label{distribution}}
+
+We are also interested in the music attribute distributions of my
+listening habit. First, we will use a \texttt{facet\_grid} to plot
+multiple density charts of the attributes that have the range from
+\texttt{0.0} to \texttt{1.0}. From the charts below, I can find that:
+
+\begin{itemize}
+\item
+  I generally prefer to listen to sad and moody songs - higher
+  distribution of low valence compared to high valence.
+\item
+  I generally listen to energetic songs.
+\item
+  I don't really listen to live music that much.
+\item
+  I don't really listen to acoustic songs that much.
+\item
+  Most of the songs that I listen to have vocals.
+\end{itemize}
+
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-13-1.pdf}
+
+Other observations include:
+
+\begin{itemize}
+\item
+  generally low on \texttt{speechiness} - I don't really listen to
+  podcast.
+\item
+  I prefer faster songs with higher tempo.
+\item
+  Key \texttt{1} is the mode of the \texttt{key} distribution
+\end{itemize}
+
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-14-1.pdf}
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-14-2.pdf}
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-14-3.pdf}
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-14-4.pdf}
+
+\hypertarget{unsupervised-learning---clustering}{%
+\subsubsection{Unsupervised Learning -
+Clustering}\label{unsupervised-learning---clustering}}
+
+Since I do not have the \texttt{genre} tags from my streaming history
+dataset, I will manually label the genres by conducting clustering
+analysis based on the attributes. Since \texttt{key} is categorical, we
+will remove that to perform the clustering.
+
+\begin{verbatim}
+##                  dncbl enrgy ldnss spchn acstc instr lvnss valnc tempo
+## danceability      1.00                                                
+## energy            0.12  1.00                                          
+## loudness          0.20  0.78  1.00                                    
+## speechiness       0.12  0.18  0.14  1.00                              
+## acousticness     -0.16 -0.73 -0.64 -0.07  1.00                        
+## instrumentalness -0.21 -0.21 -0.41 -0.14  0.23  1.00                  
+## liveness         -0.01  0.20  0.12  0.11 -0.19 -0.10  1.00            
+## valence           0.49  0.42  0.36  0.17 -0.29 -0.24  0.09  1.00      
+## tempo            -0.13  0.15  0.15  0.07 -0.11 -0.04 -0.05  0.03  1.00
+\end{verbatim}
+
+I will use the \texttt{scale()} function to normalize the values.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# normalize data}
+\NormalTok{x6 }\OtherTok{\textless{}{-}} \FunctionTok{scale}\NormalTok{(x3\_)}
+\FunctionTok{kable}\NormalTok{(}\FunctionTok{headTail}\NormalTok{(x6)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{latex\_options =} \StringTok{"striped"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}
+\centering
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l}
+\hline
+  & danceability & energy & loudness & speechiness & acousticness & instrumentalness & liveness & valence & tempo\\
+\hline
+\cellcolor{gray!6}{1} & \cellcolor{gray!6}{-0.57} & \cellcolor{gray!6}{-0.76} & \cellcolor{gray!6}{-0.17} & \cellcolor{gray!6}{-0.61} & \cellcolor{gray!6}{0.39} & \cellcolor{gray!6}{-0.43} & \cellcolor{gray!6}{1.29} & \cellcolor{gray!6}{-0.97} & \cellcolor{gray!6}{0.39}\\
+\hline
+2 & -0.98 & 0.41 & 0.61 & -0.33 & -0.84 & -0.41 & 0.28 & -1.34 & 0.33\\
+\hline
+\cellcolor{gray!6}{3} & \cellcolor{gray!6}{1.08} & \cellcolor{gray!6}{0.28} & \cellcolor{gray!6}{0.49} & \cellcolor{gray!6}{-0.41} & \cellcolor{gray!6}{-0.63} & \cellcolor{gray!6}{-0.44} & \cellcolor{gray!6}{-0.54} & \cellcolor{gray!6}{-0.45} & \cellcolor{gray!6}{-0.09}\\
+\hline
+4 & -0.55 & 0.76 & 1.11 & -0.53 & 0.37 & -0.44 & -0.33 & -0.86 & -0.22\\
+\hline
+\cellcolor{gray!6}{...} & \cellcolor{gray!6}{...} & \cellcolor{gray!6}{...} & \cellcolor{gray!6}{...} & \cellcolor{gray!6}{...} & \cellcolor{gray!6}{...} & \cellcolor{gray!6}{...} & \cellcolor{gray!6}{...} & \cellcolor{gray!6}{...} & \cellcolor{gray!6}{...}\\
+\hline
+868 & 1.43 & -0.43 & 0.27 & -0.05 & 0.24 & -0.44 & -0.83 & 0.91 & 0.48\\
+\hline
+\cellcolor{gray!6}{869} & \cellcolor{gray!6}{-0.25} & \cellcolor{gray!6}{0.04} & \cellcolor{gray!6}{0.04} & \cellcolor{gray!6}{-0.5} & \cellcolor{gray!6}{-0.28} & \cellcolor{gray!6}{-0.43} & \cellcolor{gray!6}{2.81} & \cellcolor{gray!6}{-0.38} & \cellcolor{gray!6}{0.41}\\
+\hline
+870 & 0.52 & -1.16 & -0.57 & -0.26 & 1.79 & -0.44 & -0.64 & -1.43 & 0.15\\
+\hline
+\cellcolor{gray!6}{871} & \cellcolor{gray!6}{-1.33} & \cellcolor{gray!6}{1.56} & \cellcolor{gray!6}{1.35} & \cellcolor{gray!6}{1.09} & \cellcolor{gray!6}{-0.84} & \cellcolor{gray!6}{-0.44} & \cellcolor{gray!6}{-0.21} & \cellcolor{gray!6}{0.09} & \cellcolor{gray!6}{2.4}\\
+\hline
+\end{tabular}
+\end{table}
+
+Next, I will run the Gap Statistic to determine the most optimal number
+of clusters to be used for the dataset. The Gap Statistic finds that the
+k value consistently increases as the number of clusters increases until
+when \texttt{k\ =\ 9}. \textbf{We will use 9 as the number of clusters}
+as it gives the highest value of \texttt{k}.
+
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-22-1.pdf}
+
+\hypertarget{k-means}{%
+\paragraph{K-Means}\label{k-means}}
+
+I will use K-Means algorithm to perform the clustering, having defined
+the cluster \texttt{k\ =\ 9}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{55}\NormalTok{)}
+\NormalTok{k\_cl }\OtherTok{\textless{}{-}} \FunctionTok{kmeans}\NormalTok{(x6,}\DecValTok{9}\NormalTok{,}\AttributeTok{nstart=}\DecValTok{25}\NormalTok{)}
+\NormalTok{k\_cl }
+\end{Highlighting}
+\end{Shaded}
+
+Mapping of clusters on a 2-Dimensional graph.
+
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-31-1.pdf}
+
+Let's look at the number of tracks belonging to each cluster.
+
+\begin{table}
+\centering
+\begin{tabular}{l|r}
+\hline
+Var1 & Freq\\
+\hline
+1 & 64\\
+\hline
+2 & 131\\
+\hline
+3 & 118\\
+\hline
+4 & 120\\
+\hline
+5 & 56\\
+\hline
+6 & 122\\
+\hline
+7 & 32\\
+\hline
+8 & 198\\
+\hline
+9 & 30\\
+\hline
+\end{tabular}
+\end{table}
+
+To understand each of the cluster better, I want to check what songs
+belong to which cluster. I will append the song information with the
+clustering result from the K-Means, together with the listening
+frequency for all of the songs.
+
+\begin{table}
+\centering
+\begin{tabular}{l|l|l|l}
+\hline
+trackName & artistName & cluster & freq\\
+\hline
+When the Sun Hits & Slowdive & 1 & 58\\
+\hline
+Weird Fishes/ Arpeggi & Radiohead & 1 & 54\\
+\hline
+Spectre & Radiohead & 1 & 34\\
+\hline
+Sweet & Cigarettes After Sex & 1 & 25\\
+\hline
+NA & NA & ... & ...\\
+\hline
+The Violence & Asking Alexandria & 9 & 1\\
+\hline
+Viva La Vida - Live from Spotify London & Coldplay & 9 & 1\\
+\hline
+Winter Wonderland & Leona Lewis & 9 & 1\\
+\hline
+sinew & Purity Ring & 9 & 1\\
+\hline
+\end{tabular}
+\end{table}
+
+Let's look at the cluster centers for each of the song attribute.
+
+\begin{table}
+\centering
+\begin{tabular}{r|r|r|r|r|r|r|r|r|r}
+\hline
+cluster & danceability & energy & loudness & speechiness & acousticness & instrumentalness & liveness & valence & tempo\\
+\hline
+1 & -0.1299626 & 0.1219869 & -0.2085161 & -0.2785330 & -0.2179679 & 2.4927592 & -0.3458345 & -0.3521443 & -0.0516031\\
+\hline
+2 & -0.1222235 & -0.4452913 & -0.1702216 & -0.3847775 & -0.1572427 & -0.3038624 & -0.2256092 & -0.7234073 & -0.5319622\\
+\hline
+3 & -0.7938341 & 0.6164709 & 0.5101176 & -0.0582194 & -0.5990766 & -0.3450470 & -0.0625386 & -0.2823504 & 1.4434993\\
+\hline
+4 & -0.2561859 & -1.3471815 & -0.9253777 & -0.3515334 & 1.6668367 & -0.2691130 & -0.4024001 & -0.6145545 & -0.1876796\\
+\hline
+5 & 0.3739930 & 0.1989231 & 0.2306517 & 3.0820842 & 0.0001598 & -0.3565640 & -0.0089868 & 0.4316999 & 0.0821129\\
+\hline
+6 & -0.1085830 & 0.8931936 & 0.7358677 & -0.1500982 & -0.6735847 & -0.3117111 & 0.4042581 & 0.0847861 & -0.4990966\\
+\hline
+7 & -1.3559605 & -2.0191720 & -2.8972783 & -0.4812925 & 2.1459318 & 2.8346980 & -0.3285355 & -1.2386945 & -0.1384740\\
+\hline
+8 & 0.9113701 & 0.3527288 & 0.3559463 & -0.1560874 & -0.3263779 & -0.3630612 & -0.2104625 & 1.1396237 & -0.0071864\\
+\hline
+9 & 0.1328856 & 0.4702698 & 0.2012896 & 0.3102602 & -0.5553080 & -0.2516463 & 3.6908090 & 0.1280368 & -0.4225401\\
+\hline
+\end{tabular}
+\end{table}
+
+Next, we can visualize them with a dodged bar plot. Immediately we can
+summarize the characteristics of each cluster.
+
+\begin{itemize}
+\item
+  Cluster 1: sad and moody, ambient and atmospheric, lack of vocals.
+  \textbf{Ambient/Instrumental Soundscapes}
+\item
+  Cluster 2: very somber songs, with slow beats. perfect to chill with.
+  \textbf{Atmospheric Downtempo}
+\item
+  Cluster 3: energetic and loud but not really for dancing.
+  \textbf{High-Energy Rock/Alternative}
+\item
+  Cluster 4: slow songs and probably emotional songs. \textbf{Acoustic
+  Ballads}
+\item
+  Cluster 5: rap or fast vocals. \textbf{Fast-Paced Rap/Energetic}
+\item
+  Cluster 6: very high energy and loud songs, with positive valence -
+  good for exercise/active listening. \textbf{High-Energy
+  Electronic/Dance}
+\item
+  Cluster 7: high \texttt{acousticness} and \texttt{instrumentalness},
+  slow and sad mood, a lot of piano/guitar, calm. \textbf{Solo
+  Piano/Instrumental}
+\item
+  Cluster 8: very danceable and positive, summer songs.
+  \textbf{Dance-Pop/Upbeat}
+\item
+  Cluster 9: live/orchestra in the recordings. \textbf{Live Concert
+  Recordings}
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{x10 }\OtherTok{\textless{}{-}}\NormalTok{ kmeans\_centres }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pivot\_longer}\NormalTok{(}\AttributeTok{cols =} \SpecialCharTok{{-}}\NormalTok{cluster,}
+               \AttributeTok{names\_to =} \StringTok{"Variable"}\NormalTok{,}
+               \AttributeTok{values\_to =} \StringTok{"Value"}\NormalTok{)}
+
+\NormalTok{x10}\SpecialCharTok{$}\NormalTok{cluster }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(x10}\SpecialCharTok{$}\NormalTok{cluster)}
+
+\FunctionTok{ggplot}\NormalTok{(x10, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Variable, }\AttributeTok{y =}\NormalTok{ Value, }\AttributeTok{fill =}\NormalTok{ cluster)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{"identity"}\NormalTok{, }\AttributeTok{position =} \StringTok{"dodge"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Variable"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Value"}\NormalTok{, }\AttributeTok{fill =} \StringTok{"Cluster"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{90}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-35-1.pdf}
+
+\hypertarget{use-polar-plot}{%
+\paragraph{Use Polar Plot}\label{use-polar-plot}}
+
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-38-1.pdf}
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-38-2.pdf}
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-38-3.pdf}
+
+We can contextualize the description of the clusters further by
+highlighting the tracks. I have only highlighted the top 20 most
+listened songs for each cluster for my personal relevance. However, a
+better approach would be to obtain the top 20 elements closest to the
+\textbf{K-means cluster centers} to describe the clusters.
+
+\begin{table}
+\centering
+\begin{tabular}{r|l|l|l|l|l|l|l|l|l}
+\hline
+id & dance-pop & atmospheric-downtempo & upbeat & alt-rock & rap & ballads & ambient & live & acoustic\\
+\hline
+\cellcolor{gray!6}{1} & \cellcolor{gray!6}{Toxicity - System Of A Down} & \cellcolor{gray!6}{Take Me Out - Franz Ferdinand} & \cellcolor{gray!6}{Under The Influence - Chris Brown} & \cellcolor{gray!6}{Thought Contagion - Muse} & \cellcolor{gray!6}{No Role Modelz - J. Cole} & \cellcolor{gray!6}{Wasteland, Baby! - Hozier} & \cellcolor{gray!6}{When the Sun Hits - Slowdive} & \cellcolor{gray!6}{Mequetrefe - Arca} & \cellcolor{gray!6}{Suspirium - Thom Yorke}\\
+\hline
+2 & The Prince - Madeon & Still Don't Know My Name - Labrinth & You're So Dark - Arctic Monkeys & Yellow - Coldplay & So Good - B.o.B & We All Knew - Labrinth & Weird Fishes/ Arpeggi - Radiohead & Madness - Live at Rome Olympic Stadium - Muse & Je te laisserai des mots - Patrick Watson\\
+\hline
+\cellcolor{gray!6}{3} & \cellcolor{gray!6}{Why Are Sundays So Depressing - The Strokes} & \cellcolor{gray!6}{Wait - M83} & \cellcolor{gray!6}{You Only Live Once - The Strokes} & \cellcolor{gray!6}{The Adults Are Talking - The Strokes} & \cellcolor{gray!6}{tell me it's okay - gnash} & \cellcolor{gray!6}{The Game of Love - Daft Punk} & \cellcolor{gray!6}{Spectre - Radiohead} & \cellcolor{gray!6}{Waiting for the End - Linkin Park} & \cellcolor{gray!6}{Unmade - Thom Yorke}\\
+\hline
+4 & Want To - Dua Lipa & Void - The Neighbourhood & Young Dumb \& Broke - Khalid & When The Sun Goes Down - Arctic Monkeys & Pony - Ginuwine & Take Me Home, Country Roads - John Denver & Sweet - Cigarettes After Sex & Numb - Linkin Park & Sit Down Beside Me - Patrick Watson\\
+\hline
+\cellcolor{gray!6}{5} & \cellcolor{gray!6}{W.D.Y.W.F.M? - The Neighbourhood} & \cellcolor{gray!6}{Who Will Save You Now - Les Friction} & \cellcolor{gray!6}{Why'd You Only Call Me When You're High? - Arctic Monkeys} & \cellcolor{gray!6}{Unstoppable - Sia} & \cellcolor{gray!6}{Roaring 20s - Panic! At The Disco} & \cellcolor{gray!6}{The Heart of Life - John Mayer} & \cellcolor{gray!6}{While We Sleep - Insomnium} & \cellcolor{gray!6}{Stronger - Kanye West} & \cellcolor{gray!6}{Interlude 2 - Poppy}\\
+\hline
+6 & Water Under the Bridge - Adele & The Weekend - SZA & Uptown Girl - Radio Edit - Westlife & Wrong Side of Heaven - Five Finger Death Punch & The Magic - Macklemore & Test Me - The xx & Sunsetz - Cigarettes After Sex & Jewel - Flume & Perfect - The Piano Guys\\
+\hline
+\cellcolor{gray!6}{7} & \cellcolor{gray!6}{Touch - Little Mix} & \cellcolor{gray!6}{Summertime Magic - Childish Gambino} & \cellcolor{gray!6}{Voices - Hurts} & \cellcolor{gray!6}{Time of Dying - Three Days Grace} & \cellcolor{gray!6}{White Privilege - Macklemore} & \cellcolor{gray!6}{The Ultracheese - Arctic Monkeys} & \cellcolor{gray!6}{Sail - AWOLNATION} & \cellcolor{gray!6}{Riquiquí - Arca} & \cellcolor{gray!6}{Dr. Ford - Ramin Djawadi}\\
+\hline
+8 & You Get Me So High - The Neighbourhood & Total Eclipse of the Heart - Bonnie Tyler & Water - Kehlani & You Found Me - The Fray & SICKO MODE - Travis Scott & This Is a Call - Les Friction & Syrups - Foals & Ideas - Au/Ra & Mi Amor - Daniel Pemberton\\
+\hline
+\cellcolor{gray!6}{9} & \cellcolor{gray!6}{Zombie - Bad Wolves} & \cellcolor{gray!6}{verbatim - blackbear} & \cellcolor{gray!6}{Whenever, Wherever - Shakira} & \cellcolor{gray!6}{Suffer - Hurts} & \cellcolor{gray!6}{slide thru (feat. Jerry Good) - blackbear} & \cellcolor{gray!6}{Where's My Love - Acoustic - SYML} & \cellcolor{gray!6}{Ushas - E.S. Posthumus} & \cellcolor{gray!6}{Killing Me Softly With His Song - Fugees} & \cellcolor{gray!6}{Quarantine - Justin Hurwitz}\\
+\hline
+10 & Unholy Confessions - Avenged Sevenfold & Toxic - Kehlani & where was u? - blackbear & Take on Me - a-ha & No Way - Fifth Harmony & You Are Not Alone - Michael Jackson & Resurrections - Lena Raine & Love Don't Cost a Thing - Jennifer Lopez & Stars Will Fall - Duster\\
+\hline
+\cellcolor{gray!6}{11} & \cellcolor{gray!6}{Welcome to the Black Parade - My Chemical Romance} & \cellcolor{gray!6}{uhgood - RM} & \cellcolor{gray!6}{Vultures - John Mayer} & \cellcolor{gray!6}{Write On Me - Fifth Harmony} & \cellcolor{gray!6}{Nonbinary - Arca} & \cellcolor{gray!6}{You're Somebody Else - flora cash} & \cellcolor{gray!6}{Scary Monsters and Nice Sprites - Skrillex} & \cellcolor{gray!6}{Love On Top - Beyoncé} & \cellcolor{gray!6}{Death and I - Darren Korb}\\
+\hline
+12 & Woman Woman - AWOLNATION & Straight for the Knife - Sia & WHISTLE - BLACKPINK & Suite-Pee - System Of A Down & Pass That Dutch - Missy Elliott & Your World Will Fail - Les Friction & Symphonia IX (My Wait Is U) - Grimes & Orphans - Coldplay & Dragonstone - Ramin Djawadi\\
+\hline
+\cellcolor{gray!6}{13} & \cellcolor{gray!6}{The Suburbs - Arcade Fire} & \cellcolor{gray!6}{Stranger Tings - RINI} & \cellcolor{gray!6}{What a Girl Wants - Christina Aguilera} & \cellcolor{gray!6}{That's My Girl - Fifth Harmony} & \cellcolor{gray!6}{Penis Song - Macklemore} & \cellcolor{gray!6}{Two Weeks in December - Skullcrusher} & \cellcolor{gray!6}{Scattered and Lost - Lena Raine} & \cellcolor{gray!6}{Remember When - Wallows} & \cellcolor{gray!6}{Everest - All Them Witches}\\
+\hline
+14 & Touch off - UVERworld & Streets - Doja Cat & White Sky - Vampire Weekend & The Catalyst - Linkin Park & Plain Jane - A\$AP Ferg & When I R.I.P. - Labrinth & She - Harry Styles & Roll Call - The Neighbourhood & Final Expense - Darren Korb\\
+\hline
+\cellcolor{gray!6}{15} & \cellcolor{gray!6}{Up\&Up - Coldplay} & \cellcolor{gray!6}{THE NEWS - PARTYNEXTDOOR} & \cellcolor{gray!6}{You'll miss me when I'm not around - Grimes} & \cellcolor{gray!6}{The Holy Mountain - Poppy} & \cellcolor{gray!6}{Show \& Tell - Melanie Martinez} & \cellcolor{gray!6}{Will He - Joji} & \cellcolor{gray!6}{Skin - Grimes} & \cellcolor{gray!6}{Sorrows - Bryson Tiller} & \cellcolor{gray!6}{Karl - M83}\\
+\hline
+16 & Walk Away - Franz Ferdinand & To Be Mine - MARUV & Unwritten - Natasha Bedingfield & Together - Sia & Soldiers - Macklemore & tokyo - RM & Snakes - Sorry & The Box - Roddy Ricch & No Quarter - Remaster - Led Zeppelin\\
+\hline
+\cellcolor{gray!6}{17} & \cellcolor{gray!6}{Washing Machine Heart - Mitski} & \cellcolor{gray!6}{To Me - Alina Baraz} & \cellcolor{gray!6}{Vowels = space and time - Grimes} & \cellcolor{gray!6}{Use Somebody - Kings of Leon} & \cellcolor{gray!6}{Sorry Not Sorry - Demi Lovato} & \cellcolor{gray!6}{The A Team - Ed Sheeran} & \cellcolor{gray!6}{The Antichrist - Slayer} & \cellcolor{gray!6}{The Violence - Asking Alexandria} & \cellcolor{gray!6}{Philosophy of Time Travel - Michael Andrews}\\
+\hline
+18 & We Can't Stop - Miley Cyrus & Watch Your Mouth - The Backseat Lovers & What the Hell - Avril Lavigne & Vanishing Point - Alexandra Savior & Vibe (If I Back It Up) - Cookiee Kawaii & Vacation - RINI & The Painful Way - Darren Korb & Viva La Vida - Live from Spotify London - Coldplay & The Mission / How Great Thou Art - The Piano Guys\\
+\hline
+\cellcolor{gray!6}{19} & \cellcolor{gray!6}{Why - Dominic Fike} & \cellcolor{gray!6}{White Flag - Daughtry} & \cellcolor{gray!6}{Wheels on the Bus - Melanie Martinez} & \cellcolor{gray!6}{White Flag - Dido} & \cellcolor{gray!6}{WTF Are We Talking For - Labrinth} & \cellcolor{gray!6}{Within - Daft Punk} & \cellcolor{gray!6}{Truly - Cigarettes After Sex} & \cellcolor{gray!6}{Winter Wonderland - Leona Lewis} & \cellcolor{gray!6}{The Theory of Everything - Jóhann Jóhannsson}\\
+\hline
+20 & X - Poppy & Your Voice - Les Friction & XS - Rina Sawayama & 乱舞のメロディ - SID & You Got It - Vedo & you broke me first - Tate McRae & Wall Fuck - Flume & sinew - Purity Ring & Thermometer - Poppy\\
+\hline
+\end{tabular}
+\end{table}
+
+Get the frequency and seconds played of each cluster to understand
+listening habits
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{x9}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 871 x 4
+## # Groups:   trackName [864]
+##    trackName                 artistName           cluster  freq
+##    <chr>                     <chr>                <fct>   <int>
+##  1 When the Sun Hits         Slowdive             ambient    58
+##  2 Weird Fishes/ Arpeggi     Radiohead            ambient    54
+##  3 Spectre                   Radiohead            ambient    34
+##  4 Sweet                     Cigarettes After Sex ambient    25
+##  5 My Name is Dark - Art Mix Grimes               ambient    23
+##  6 Breathe                   The Prodigy          ambient    22
+##  7 Forever                   Labrinth             ambient    21
+##  8 Ingenue                   Atoms For Peace      ambient    21
+##  9 While We Sleep            Insomnium            ambient    11
+## 10 Inhaler                   Foals                ambient     7
+## # i 861 more rows
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{x12 }\OtherTok{\textless{}{-}} \FunctionTok{left\_join}\NormalTok{(master.data, x9, }\AttributeTok{by =} \FunctionTok{c}\NormalTok{(}\StringTok{"trackName"}\NormalTok{, }\StringTok{"artistName"}\NormalTok{))}
+\NormalTok{x12 }\OtherTok{\textless{}{-}} \FunctionTok{na.omit}\NormalTok{(x12)}
+
+\NormalTok{x13 }\OtherTok{\textless{}{-}}\NormalTok{ x12 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(cluster) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{totalPlayed =} \FunctionTok{sum}\NormalTok{(seconds), }\AttributeTok{freq =} \FunctionTok{n}\NormalTok{()) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{cluster =} \FunctionTok{as.factor}\NormalTok{(cluster))}
+
+\FunctionTok{ggplot}\NormalTok{(x13, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{reorder}\NormalTok{(cluster, }\SpecialCharTok{{-}}\NormalTok{totalPlayed), }\AttributeTok{y =}\NormalTok{ totalPlayed}\SpecialCharTok{/}\DecValTok{3600}\NormalTok{)) }\SpecialCharTok{+} \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{\textquotesingle{}identity\textquotesingle{}}\NormalTok{, }\AttributeTok{fill =} \StringTok{\textquotesingle{}skyblue\textquotesingle{}}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Cluster"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Total Hours Played"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{geom\_text}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{label =} \FunctionTok{round}\NormalTok{(totalPlayed}\SpecialCharTok{/}\DecValTok{3600}\NormalTok{, }\DecValTok{0}\NormalTok{)), }\AttributeTok{vjust =} \SpecialCharTok{{-}}\FloatTok{0.5}\NormalTok{, }\AttributeTok{size =} \DecValTok{3}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{90}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-40-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(x13, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{reorder}\NormalTok{(cluster, }\SpecialCharTok{{-}}\NormalTok{freq), }\AttributeTok{y =}\NormalTok{ freq)) }\SpecialCharTok{+} \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{\textquotesingle{}identity\textquotesingle{}}\NormalTok{, }\AttributeTok{fill =} \StringTok{\textquotesingle{}\#FFC733\textquotesingle{}}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Cluster"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Frequency"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{geom\_text}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{label =} \FunctionTok{round}\NormalTok{(freq, }\DecValTok{0}\NormalTok{)), }\AttributeTok{vjust =} \SpecialCharTok{{-}}\FloatTok{0.5}\NormalTok{, }\AttributeTok{size =} \DecValTok{3}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{90}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-40-2.pdf}
+
+Get frequency by month
+
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-41-1.pdf}
+\includegraphics{analysis_files/figure-latex/unnamed-chunk-41-2.pdf}
+
+\end{document}
